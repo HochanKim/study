@@ -186,12 +186,12 @@ for error in data:
 # 설비들의 진동을 담기 위한 빈 딕셔너리 생성
 first_vibe = {}
 
-
 for idx, i in enumerate(data):
     vib_get = i.get("m")["vib"]
     type_name = i.get("type")
     machine_year = i.get("year")
-    logs_data = i.get("logs")
+    logs_data = i.get("logs", {})
+    print(type_name, machine_year, logs_data)
     # print(f"모든 기계: {type_name}, {machine_year}, {vib_get}, {log_error}")
     if (type_name in first_vibe) == True and machine_year >= 2018:
         # 딕셔너리 키에 존재하고 2018년 이후에 제작된 설비
@@ -199,11 +199,10 @@ for idx, i in enumerate(data):
     elif (type_name in first_vibe) == False and machine_year >= 2018:
         # 딕셔너리 키에 존재하지 않으면서 2018년 이후에 제작된 설비
         first_vibe[type_name] = [vib_get]  # 딕셔너리 키 생성
-print(first_vibe)  # 2018년 미만 설비들을 제외한 딕셔너리 정보
+# print(first_vibe)  # 2018년 미만 설비들을 제외한 딕셔너리 정보
 
 # 진동 평균 구하기
 # avg_vibe = {}
-
 # for k, v in first_vibe.items():
 #     print(sum(v))
 #     print(len(v))
