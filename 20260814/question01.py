@@ -247,255 +247,359 @@ print(f"전체 매출: {sum_earns(right_datas):,}원")
 print("\n--- 문제 4 ---")
 
 
+def sum_by(rows, group_key, value_key):
+    # 합산 자료를 넣을 빈 딕셔너리 'result'
+    # group_key: 매장명
+    # value_key: 매출 금액
+    sum_result = {}
+    for row in rows:
+        key = row[group_key]
+        sum_result[key] = sum_result.get(key, 0) + row[value_key]
+    return sum_result
+
+
+print(sum_by(right_datas, "매장", "전체 매출"))
+
+
+def count_by(rows, group_key):
+    # 매장별 매출 개수를 담는 빈 딕셔너리
+    cnt_result = {}
+    for row in rows:
+        key = row[group_key]
+        cnt_result[key] = cnt_result.get(key, 0) + len(row[group_key])
+    return cnt_result
+
+
+print(count_by(right_datas, "매장"))
+
 # -------------------------------------------------------------
-
 # [문제 5] 매장별 매출과 막대그래프
-
 # -------------------------------------------------------------
 
 # 문제 4의 sum_by 를 써서 매장별 매출을 구하고,
-
 # 옆에 막대그래프를 그려 출력하세요.
-
-#
-
 # 막대는 1만원당 ■ 하나로 그리세요.
 
-#
-
 # [출력 예시]
-
 #   강남점    00,000원  ■■■■■
-
 #   홍대점    00,000원  ■■■■
-
 #   부산점    00,000원  ■■■■
 
-#
 
 # [힌트] "■" * (금액 // 10000)
-
 #        f"{금액:,}" 로 쓰면 천 단위 쉼표가 붙습니다.
-
 # -------------------------------------------------------------
 
 print("\n--- 문제 5 ---")
 
+# 매출 딕셔너리 저장하는 변수 'cafe_earning'
+cafe_earning = sum_by(right_datas, "매장", "전체 매출")
+
+print(cafe_earning)
+
+
+def make_bar(value, unit, mark="■"):
+    # 숫자들을(value, unit) 받아 막대그래프 문자열(mark) 생성
+    return int(value // unit) * mark
+
+
+for earn in cafe_earning:
+    earn_graph = make_bar(cafe_earning.get(earn), 10000)
+    print(f"{earn:<7}: {cafe_earning.get(earn):,}원 {earn_graph}")
 
 # -------------------------------------------------------------
-
 # [문제 6] 분류별 집계표
-
 # -------------------------------------------------------------
 
 # 분류(커피/논커피/디저트)별로 아래 세 가지를 구해 표로 출력하세요.
-
 #   - 주문 건수
-
 #   - 매출 합계
-
 #   - 건당 평균 (소수 첫째 자리까지)
+# => key: 분류, 전체 매출
 
-#
 
 # [출력 예시]
-
 #   분류      건수      합계      평균
-
 #   ------------------------------------
-
 #   커피         0   000,000   00000.0
-
 #   논커피       0     0,000    0000.0
-
 #   디저트       0    00,000   00000.0
 
-#
 
 # [힌트] 문제 4에서 만든 함수 두 개를 모두 씁니다.
-
+# => sum_by(rows, group_key, value_key) // count_by(rows, group_key)
 #        칸 맞추기: f"{값:<6}" 왼쪽 정렬, f"{값:>8}" 오른쪽 정렬
-
 # -------------------------------------------------------------
 
 print("\n--- 문제 6 ---")
 
+kind_sum = sum_by(right_datas, "분류", "전체 매출")
+kind_cnt = count_by(right_datas, "분류")
+
+print("분류       건수     합계       평균")
+print("-" * 40)
+for s in kind_sum:
+    print(
+        f"{s:<10} {kind_cnt.get(s):<5} {kind_sum.get(s):<5,} {round(kind_sum.get(s) / kind_cnt.get(s), 1):>10}"
+    )
 
 # -------------------------------------------------------------
-
 # [문제 7] 조건으로 걸러내기
-
 # -------------------------------------------------------------
 
 # 아래 두 가지를 각각 구해 출력하세요.
-
-#
-
 #   1) 포장 주문(포장 열이 "Y")의 건수와 매출 합계
-
 #   2) 오전 매출 합계와 오후 매출 합계
 
-#
-
 # [출력 예시]
-
 #   포장 주문: 0건, 00,000원
-
 #   오전 매출: 00,000원
-
 #   오후 매출: 00,000원
-
 # -------------------------------------------------------------
 
 print("\n--- 문제 7 ---")
+# 포장 주문 건수
+pack_cnt = 0
+# 포장 주문 매출
+pack_earning = 0
+# 오전 매출
+before_twelve = 0
+# 오후 매출
+after_twelve = 0
 
+for rd in right_datas:
+    if rd["포장"] == "Y":
+        # 포장 주문 건수와 매출 합계
+        pack_cnt += 1
+        pack_earning += rd["전체 매출"]
+
+    if rd["시간대"] == "오전":
+        before_twelve += rd["전체 매출"]
+    else:
+        after_twelve += rd["전체 매출"]
+
+print(f"포장 주문: {pack_cnt}건, {pack_earning:,}원")
+print(f"오전 매출: {before_twelve:,}원")
+print(f"오후 매출: {after_twelve:,}원")
 
 # -------------------------------------------------------------
-
 # [문제 8] 가장 많이 팔린 메뉴 찾기
-
 # -------------------------------------------------------------
 
 # 메뉴별 판매 수량을 합산하고,
-
 # 가장 많이 팔린 메뉴와 그 수량을 찾는 함수를 만드세요.
 
-#
 
 #   함수 이름 : best_menu(rows)
-
 #   반환      : (메뉴이름, 수량) 두 개를 함께 돌려줄 것
 
-#
 
 # 만든 뒤 메뉴별 수량 전체와 1등을 출력하세요.
 
-#
-
 # [출력 예시]
-
 #   메뉴별 판매 수량
-
 #     아메리카노  00개
-
 #     카페라떼    00개
-
 #     ...
-
 #   가장 많이 팔린 메뉴: OOO (00개)
 
-#
-
 # [힌트] 현재 1등을 변수에 담아두고 하나씩 비교하며 갱신합니다.
-
 #        수량 합산은 문제 4의 sum_by 를 재사용하세요.
-
 # -------------------------------------------------------------
 
 print("\n--- 문제 8 ---")
 
+# 빈 딕셔너리 - 전역 (총 메뉴 리스트)
+all_menu = {}
+
+
+def best_menu(rows):
+    # 많이 팔린 메뉴 담는 빈 변수
+    many_sell_menu = ""
+    # 많이 팔린 개수
+    many_cnt = 0
+    # 빈 딕셔너리 - 로컬 (동점자 처리)
+    many_sells = {}
+
+    for i in rows:
+        menu_name = i.get("메뉴")
+        menu_cnt = len(menu_name)
+        all_menu[menu_name] = i.get(menu_name, 0) + menu_cnt
+        if many_cnt <= len(menu_name):
+            many_sell_menu = menu_name
+            many_cnt = len(menu_name)
+            many_sells[many_sell_menu] = many_cnt
+
+    return many_sells, many_cnt
+
+
+ingi_menu, many_sell = best_menu(right_datas)
+
+print("메뉴별     판매 수량")
+for j in all_menu:
+    menu_name = j
+    menu_cnt = all_menu.get(j)
+    print(f"{menu_name:<8} {menu_cnt}개")
+print()
+for k in ingi_menu:
+    print(f"가장 많이 팔린 메뉴: {k} ({many_sell}개)")
 
 # -------------------------------------------------------------
-
 # [문제 9] 결과를 CSV 로 저장하기
-
 # -------------------------------------------------------------
-
 # 아래 두 파일을 만드세요.
-
-#
-
 #   1) data/매장별_매출.csv
-
 #      열 구성 : 매장, 주문건수, 매출합계
-
-#
-
 #   2) data/오류목록.csv
-
 #      열 구성 : 줄번호, 메뉴, 사유
-
 #      (문제 3에서 걸러낸 이상한 데이터)
 
-#
-
 # 조건 : 엑셀로 열었을 때 한글이 깨지지 않아야 합니다.
-
-#
-
 # 저장한 뒤 두 파일을 다시 읽어서 내용을 출력해 확인하세요.
-
-#
-
 # [힌트] encoding 을 뭘로 해야 할까요? 그냥 utf-8 이 아닙니다.
-
 # -------------------------------------------------------------
 
 print("\n--- 문제 9 ---")
 
+# 필요 값들을 담기 위한 빈 딕셔너리
+stores_data = {}
+
+store_name = list(sum_by(right_datas, "매장", "전체 매출").keys())
+store_earning = list(sum_by(right_datas, "매장", "전체 매출").values())
+store_sell_cnt = list(count_by(right_datas, "매장").values())
+
+stores_data["매장"] = store_name
+stores_data["주문건수"] = store_sell_cnt
+stores_data["전체 매출"] = store_earning
+
+# 필요한 값들을 따로 리스트에 저장
+stores_data_ls = []
+for i in range(len(stores_data.get("매장"))):
+    stores_data_ls.append(
+        {
+            # 'Key: Value' 형식으로 딕셔너리 형태로 묶어서
+            # 리스트에 저장
+            "매장": stores_data["매장"][i],
+            "주문건수": stores_data["주문건수"][i],
+            "전체 매출": stores_data["전체 매출"][i],
+        }
+    )
+
+right_datas_report = DATA / "매장별_매출.csv"
+
+with open(right_datas_report, "w", encoding="utf-8-sig", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["매장", "주문건수", "매출합계"])
+    for branch in stores_data_ls:
+        writer.writerow(
+            [branch.get("매장"), branch.get("주문건수"), branch.get("전체 매출")]
+        )
+
+wrong_ls1 = {}
+wrong_ls1["줄번호"] = wrong_datas[0][0]
+wrong_ls1["메뉴"] = wrong_datas[0][1]
+wrong_ls1["사유"] = wrong_datas[0][2]
+
+wrong_ls2 = {}
+wrong_ls2["줄번호"] = wrong_datas[1][0]
+wrong_ls2["메뉴"] = wrong_datas[1][1]
+wrong_ls2["사유"] = wrong_datas[1][2]
+
+wrong_list = [wrong_ls1, wrong_ls2]
+
+
+wrong_datas_report = DATA / "오류목록.csv"
+
+with open(wrong_datas_report, "w", encoding="utf-8-sig", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["줄번호", "메뉴", "사유"])
+    for branch in wrong_list:
+        writer.writerow([branch.get("줄번호"), branch.get("메뉴"), branch.get("사유")])
 
 # -------------------------------------------------------------
-
 # [문제 10] 보고서 만들기
-
 # -------------------------------------------------------------
 
 # 지금까지 구한 내용을 모아 data/일일보고서.txt 로 저장하세요.
-
 # CSV 가 아니라 그냥 텍스트 파일입니다.
 
-#
-
 # [파일에 들어갈 내용 예시]
-
 #   ========================================
-
 #    카페 매출 보고서
-
 #   ========================================
-
 #   총 주문: 00건
-
 #   총 매출: 000,000원
 
-#
-
 #   [매장별]
-
 #     강남점  00,000원
-
 #     홍대점  00,000원
-
 #     부산점  00,000원
 
-#
-
 #   [분류별]
-
 #     커피    000,000원
-
 #     논커피    0,000원
-
 #     디저트   00,000원
 
-#
-
 #   가장 많이 팔린 메뉴: OOO
-
 #   ----------------------------------------
 
 #   처리 실패: 0건 (오류목록.csv 참고)
 
-#
-
 # [힌트] 여러 줄을 쓸 때는 f.write() 를 여러 번 부르면 됩니다.
-
 #        줄 끝에 \n 을 꼭 붙이세요.
-
-#
-
 # 저장한 뒤 파일을 다시 읽어서 화면에도 출력해 보세요.
 
 # -------------------------------------------------------------
 
 print("\n--- 문제 10 ---")
+
+
+cafe_report = DATA / "일일보고서.txt"
+
+# 총 주문 개수
+all_orders = len(right_datas)
+
+# 총 매출
+all_earns = 0
+
+for i in right_datas:
+    all_earns += i.get("전체 매출")
+
+
+def best_menu_price(rows):
+    # 분류별 넣기
+    menu_kind = {}
+    # 종류별 매출
+    for i in rows:
+        if menu_kind.get(i.get("분류")) == None:
+            menu_kind[i.get("분류")] = menu_kind.get(i.get("분류"), 0) + i.get(
+                "전체 매출"
+            )
+        else:
+            menu_kind[i.get("분류")] += i.get("전체 매출")
+    return menu_kind
+
+
+best_sell = best_menu_price(right_datas)
+
+with open(cafe_report, "w", encoding="utf-8-sig", newline="") as f:
+    f.write(f"{'=' * 30}\n")
+    f.write("카페 매출 보고서\n")
+    f.write(f"{'=' * 30}\n")
+    f.write(f"총 주문: {all_orders}건\n")
+    f.write(f"총 매출: {all_earns:,}원\n")
+    f.write("\n[매장별]\n")
+    for i in stores_data_ls:
+        f.write(f"{i.get('매장')} {i.get('전체 매출'):>10,}원\n")
+    f.write("\n[분류별]\n")
+    for j in best_sell:
+        f.write(f"{j:<10} {best_sell.get(j):>10,}원\n")
+    f.write("\n")
+    for k in ingi_menu:
+        f.write(f"가장 많이 팔린 메뉴: {k} ({many_sell}개)\n")
+    f.write(f"{'-' * 30}\n")
+    for i in right_datas:
+        if i.get("사유") == None:
+            zero = i.get("사유")
+            zero = 0
+    f.write(f"처리 실패: {zero}건")
