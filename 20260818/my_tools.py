@@ -316,3 +316,68 @@ def print_table(rows, columns):
         for col in columns:
             line += str(row.get(col, "")).ljust(widths[col] + 2)
         print(line)
+
+
+# ============================================================
+#  5. 자체 테스트
+# ============================================================
+#
+# if __name__ == "__main__": 의 의미
+#
+#   아래 블록은 '이 파일을 직접 실행했을 때만' 돌아갑니다.
+#   다른 파일에서 import 할 때는 실행되지 않습니다.
+#
+#   [원리]
+#     파이썬은 파일마다 __name__ 이라는 변수를 자동으로 만듭니다.
+#
+#       직접 실행 (python my_tools.py)  -> __name__ 은 "__main__"
+#       import 될 때                    -> __name__ 은 "my_tools"
+#
+#     그래서 __name__ == "__main__" 인지 확인하면
+#     "지금 내가 직접 실행된 건가?" 를 알 수 있습니다.
+#
+#   [왜 필요한가]
+#     이게 없으면, 다른 파일에서 import 하는 순간
+#     아래 테스트 코드가 전부 실행되어 버립니다.
+#     원하지 않는 출력이 잔뜩 나오겠죠.
+#
+#   모듈을 만들 때는 항상 이 블록으로 감싸세요.
+
+if __name__ == "__main__":
+    print("=" * 55)
+    print(f" my_tools.py 자체 테스트 (버전 {VERSION})")
+    print("=" * 55)
+
+    print("\n[1] 숫자 변환")
+    print("  to_int('  42 ')        =", to_int("  42 "))
+    print("  to_int('사십이')        =", to_int("사십이"))
+    print("  to_int('사십이', -1)    =", to_int("사십이", -1))
+    print("  to_float('3.14')       =", to_float("3.14"))
+    print("  clean_number('4,500원') =", clean_number("4,500원"))
+
+    print("\n[2] 통계")
+    print("  get_average([1, 2, 3]) =", get_average([1, 2, 3]))
+    print("  get_average([])        =", get_average([]))
+    print("  find_max([3, 9, 1])    =", find_max([3, 9, 1]))
+    print("  find_min([3, 9, 1])    =", find_min([3, 9, 1]))
+
+    sample = [
+        {"부서": "영업", "연봉": 4500},
+        {"부서": "개발", "연봉": 5200},
+        {"부서": "영업", "연봉": 5100},
+    ]
+    print("  sum_by(...)            =", sum_by(sample, "부서", "연봉"))
+    print("  count_by(...)          =", count_by(sample, "부서"))
+
+    print("\n[3] 출력 꾸미기")
+    print("  make_bar(5000)         =", make_bar(5000))
+    print("  format_money(1234567)  =", format_money(1234567))
+
+    print("\n[4] 표 출력")
+    print_table(sample, ["부서", "연봉"])
+
+    print("\n" + "=" * 55)
+    print(" 테스트 완료")
+    print(" 이 출력은 my_tools.py 를 직접 실행했을 때만 나옵니다.")
+    print("   다른 파일에서 import 하면 나오지 않습니다.")
+    print("=" * 55)
