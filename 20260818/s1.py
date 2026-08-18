@@ -181,7 +181,11 @@ print("작성자:", my_tools.AUTHOR)
 print("\n [숫자 변환 함수들]")
 print(" to_int(' 4500 ') =", my_tools.to_int(" 4500 "))
 print(" to_int('사천오백') =", my_tools.to_int("사천오백"), "<= 실패하면 기본값 반환")
-print(" to_int('사천오백', -1) =", my_tools.to_int("사천오백", -1), "<= 실패하면 -1로 반환")
+print(
+    " to_int('사천오백', -1) =",
+    my_tools.to_int("사천오백", -1),
+    "<= 실패하면 -1로 반환",
+)
 print(" clean_number('4,500원') =", my_tools.clean_number("4,500원"))
 
 print("\n [통계 함수들]")
@@ -196,6 +200,7 @@ print(" find_min([3, 9, 1]) =", my_tools.find_min([3, 9, 1]))
 import my_tools as mt
 
 from my_tools import make_bar, format_money
+
 print("\n [골라오기]")
 print("make_bar(5000) =", make_bar(5000))
 print("make_bar(5000) =", format_money(12345))
@@ -294,8 +299,8 @@ print("my_tools의 '__name__':", my_tools.__name__)
 # -------------------------------------------------------------
 # 7. import가 안될 때 체크리스트
 # -------------------------------------------------------------
-# ModuleNotFoundError: No module named 'pandas' 
-# => 이 에러를 만나면 위에서부터 코드 확인 
+# ModuleNotFoundError: No module named 'pandas'
+# => 이 에러를 만나면 위에서부터 코드 확인
 # => 대부분 5번이 원인
 
 # 1) 설치를 했는가?
@@ -325,5 +330,30 @@ print("my_tools의 '__name__':", my_tools.__name__)
 # => 또는 설치할 때 이렇게 쓰기 / python -m pip install pandas
 
 # -------------------------------------------------------------
-# 8. import가 안될 때 체크리스트
+# 8. 정리
 # -------------------------------------------------------------
+
+#   [import 문법]
+#     import math                 표준 라이브러리
+#     import my_tools             내가 만든 파일 (.py 는 뺀다)
+#     import pandas as pd         외부 패키지 + 별칭
+#     from math import sqrt       함수만 골라오기
+
+
+#   [모듈 만들 때 규칙]
+
+#     - 관련 있는 함수끼리 한 파일에 모은다
+#     - 각 함수에 docstring 으로 설명을 단다
+#     - 실행 코드는 if __name__ == "__main__": 안에 넣는다
+
+#   [pip 명령어]
+#     pip install 패키지명         설치
+#     pip list                    목록 확인
+#     python -m pip install ...   안 될 때 이렇게
+
+#   [기억할 것 5가지]
+#     1. import 는 남이 만든 코드 가져오기. 내 파일도 똑같이 가져온다
+#     2. import 하면 그 파일이 한 번 실행된다
+#     3. 그래서 테스트 코드는 if __name__ == "__main__": 로 감싼다
+#     4. 외부 패키지는 터미널에서 pip install 로 설치한다
+#     5. import 가 안 되면 5-1 의 5번(파이썬이 여러 개)부터 의심하라
