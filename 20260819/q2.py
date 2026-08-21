@@ -293,104 +293,104 @@
 # print(f"최고 실수령: {best.name}")
 
 
-# =============================================================
-# [문제 6] 계좌와 저축계좌 (상속 + 캡슐화)
-# =============================================================
+# # =============================================================
+# # [문제 6] 계좌와 저축계좌 (상속 + 캡슐화)
+# # =============================================================
 
-class Account:
-    def __init__(self, owner, balance):
-        self._owner = owner
-        self._balance = balance
-        self._trade = []
+# class Account:
+#     def __init__(self, owner, balance):
+#         self._owner = owner
+#         self._balance = balance
+#         self._trade = []
 
-    # 잔액 조회
-    def get_balance(self):
-        return self._balance
+#     # 잔액 조회
+#     def get_balance(self):
+#         return self._balance
 
-    # 입금
-    def deposit(self, amount):
-        if amount <= 0:
-            print("입금액은 0보다 커야 합니다")
-            return
-        else:
-          self._balance += amount
-          print(f"{amount:,}원 입금 (잔액 {self._balance:,}원)")
+#     # 입금
+#     def deposit(self, amount):
+#         if amount <= 0:
+#             print("입금액은 0보다 커야 합니다")
+#             return
+#         else:
+#           self._balance += amount
+#           print(f"{amount:,}원 입금 (잔액 {self._balance:,}원)")
 
-        self._trade.append(f"입금 {amount}")
+#         self._trade.append(f"입금 {amount}")
 
-    # 출금
-    def withdraw(self, amount):
-        if amount > self._balance:
-            print(f"잔액 부족 (현재 {self._balance:,}원)")
-            return
+#     # 출금
+#     def withdraw(self, amount):
+#         if amount > self._balance:
+#             print(f"잔액 부족 (현재 {self._balance:,}원)")
+#             return
 
-        self._balance -= amount
+#         self._balance -= amount
 
-        print(f"{amount:,}원 출금 (잔액 {self._balance:,}원)")
+#         print(f"{amount:,}원 출금 (잔액 {self._balance:,}원)")
 
-        self._trade.append(f"출금 {amount}")
+#         self._trade.append(f"출금 {amount}")
 
-    # 거래 내역
-    def history(self):
-        print("[거래 내역]")
-        for idx, trade in enumerate(self._trade):
-            print(f"  {idx + 1}. {trade}")
+#     # 거래 내역
+#     def history(self):
+#         print("[거래 내역]")
+#         for idx, trade in enumerate(self._trade):
+#             print(f"  {idx + 1}. {trade}")
 
-    # 계좌 정보
-    def show(self):
-        print(f"{self._owner}님 계좌  잔액 {self._balance:,}원  거래 {len(self._trade)}건")
-
-
-class SavingsAccount(Account):
-
-    def __init__(self, owner, balance, rate):
-        # super()를 통해 부모 클래스 상속 적용
-        super().__init__(owner, balance)
-        self._rate = rate
-
-    def add_interest(self):
-        # 이자 지급
-        self.interest = int(self._balance * self._rate)
-        print(f"이자 {self.interest:,}원 지급")
-        # 부모 클래스의 입금 기능 사용
-        self.deposit(self.interest)
-
-    # 저축계좌의 출금
-    def withdraw(self, amount):
-        self.fee = 1000
-        total = amount + self.fee
-        if total > self._balance:
-            print(
-                f"잔액 부족 "
-                f"(현재 {self._balance:,}원)"
-            )
-            return
-
-        self._balance -= total
-
-        print(f"출금 수수료 {self.fee:,}원")
-        print(
-            f"{amount:,}원 출금 "
-            f"(잔액 {self._balance:,}원)"
-        )
-
-        # 수수료는 거래내역에 기록하지 않는다.
-        self._trade.append(f"출금 {amount}")
+#     # 계좌 정보
+#     def show(self):
+#         print(f"{self._owner}님 계좌  잔액 {self._balance:,}원  거래 {len(self._trade)}건")
 
 
-a = Account("김철수", 50000)
-a.show()
-a.deposit(10000)
-a.deposit(-5000)
-a.withdraw(20000)
-a.withdraw(999999)
-a.show()
-a.history()
+# class SavingsAccount(Account):
 
-print()
+#     def __init__(self, owner, balance, rate):
+#         # super()를 통해 부모 클래스 상속 적용
+#         super().__init__(owner, balance)
+#         self._rate = rate
 
-s = SavingsAccount("이영희", 100000, 0.05)
-s.show()
-s.add_interest()
-s.withdraw(20000)
-s.show()
+#     def add_interest(self):
+#         # 이자 지급
+#         self.interest = int(self._balance * self._rate)
+#         print(f"이자 {self.interest:,}원 지급")
+#         # 부모 클래스의 입금 기능 사용
+#         self.deposit(self.interest)
+
+#     # 저축계좌의 출금
+#     def withdraw(self, amount):
+#         self.fee = 1000
+#         total = amount + self.fee
+#         if total > self._balance:
+#             print(
+#                 f"잔액 부족 "
+#                 f"(현재 {self._balance:,}원)"
+#             )
+#             return
+
+#         self._balance -= total
+
+#         print(f"출금 수수료 {self.fee:,}원")
+#         print(
+#             f"{amount:,}원 출금 "
+#             f"(잔액 {self._balance:,}원)"
+#         )
+
+#         # 수수료는 거래내역에 기록하지 않는다.
+#         self._trade.append(f"출금 {amount}")
+
+
+# a = Account("김철수", 50000)
+# a.show()
+# a.deposit(10000)
+# a.deposit(-5000)
+# a.withdraw(20000)
+# a.withdraw(999999)
+# a.show()
+# a.history()
+
+# print()
+
+# s = SavingsAccount("이영희", 100000, 0.05)
+# s.show()
+# s.add_interest()
+# s.withdraw(20000)
+# s.show()

@@ -185,37 +185,37 @@ ex_int = []
 over_int = []
 
 
-# # 정수 반환 함수
-# def chg_int(value):
-#     try:
-#         int_var = int(value)
-#         if 0 > value or 1000 < value:
-#             over_int.append(value)
-#         return int_var
-#     except ValueError:
-#         ex_int.append(value)
+# 정수 반환 함수
+def chg_int(value):
+    try:
+        int_var = int(value)
+        if 0 > value or 1000 < value:
+            over_int.append(value)
+        return int_var
+    except ValueError:
+        ex_int.append(value)
 
 
-# # 범위 내 숫자 리스트
-# def right_int(number):
-#     num_list = []
-#     num_list.append(number)
-#     max_n = 0
-#     min_n = 0
-#     for n in num_list:
-#         if max_n < n:
-#             max_n = n
-#         if min_n > n:
-#             min_n = n
-#     return max_n, min_n, num_list
+# 범위 내 숫자 리스트
+def right_int(number):
+    num_list = []
+    num_list.append(number)
+    max_n = 0
+    min_n = 0
+    for n in num_list:
+        if max_n < n:
+            max_n = n
+        if min_n > n:
+            min_n = n
+    return max_n, min_n, num_list
 
 
-# while True:
-#     rd_value = input("값 입력(공백 구분) : ")
-#     param = chg_int(rd_value)
-#     if type(param) is int:
-#         right_int(param)
-#     max_number, min_number, right_num_ls = right_int(param)
+while True:
+    rd_value = input("값 입력(공백 구분) : ")
+    param = chg_int(rd_value)
+    if type(param) is int:
+        right_int(param)
+    max_number, min_number, right_num_ls = right_int(param)
 
-#     if rd_value == 'end':
-#         break
+    if rd_value == 'end':
+        break
