@@ -127,17 +127,16 @@ for d in students:
   d["평균"] = get_average(d["총점"])
   d["등급"] = get_grade(d["평균"])
 
-for i in students:
+def print_report(students):
+  for i in students:
     # 키값들을 리스트화
     keys_ls = list(i.keys())
 
-for k in keys_ls:
-  # 리스트에 담은 키값들 풀기
-  print(f"{k:<5}", end=" ")
-print()
-print("-"*60)
-
-def print_report(students):
+  for k in keys_ls:
+    # 리스트에 담은 키값들 풀기
+    print(f"{k:<5}", end=" ")
+  print()
+  print("-"*60)
   # 학생 정보 리스트를 파라미터로 전달 받아
   for i in students:
     # 밸류값들을 리스트화
@@ -449,6 +448,7 @@ print("A등급:", find_by_grade(students, "A"))
 print("F등급:", find_by_grade(students, "F"))
 print()
 print_warning(students)
+print()
 
 
 # =============================================================
@@ -504,6 +504,73 @@ print_warning(students)
 # print(f"삭제 후 인원: {len(new_list)}명")
 
 
+def add_student(students, name, class_name, kor, eng, math):
+  # 새로 생성한 빈 리스트에 원본 리스트 복사
+  new_list = []
+  for s in students:
+      new_list.append(s.copy())
+  add_stu = {}
+  for s in students:
+    if s["이름"] == name:
+      print(f"이미 있는 학생: {name}")
+      break
+    add_stu["이름"] = name
+    add_stu["반"] = class_name
+    add_stu["국어"] = kor
+    add_stu["영어"] = eng
+    add_stu["수학"] = math
+  if add_stu: # 'add_stu'에 값이 존재하면 True
+    new_list.append(add_stu)
+    return new_list
+  else:
+    return new_list
+
+def update_score(students, name, subject, score):
+  for s in students:
+    if (s["이름"] == name) is True:
+      if 0 > score or 100 < score:
+        print(f"잘못된 점수: {score}")
+        return students
+      s[subject] = score
+      return students
+  print(f"없는 학생: {name}")
+  return students
+
+
+def remove_student(students, name):
+  for i in students:
+      # 리스트 내 딕셔너리(i) 중 name값과 맞는 것은
+      # 해당 딕셔너리 내용 전부 제거
+      if i.get("이름") == name:
+          i.clear()
+
+  for ls in students:
+      # 제거된 값의 흔적(빈 딕셔너리: {}) 찾아서 삭제 
+      if ls == {}:
+          students.remove(ls)
+  return students
+
+
+new_list = add_student(students, "한지민", "A", 85, 90, 88)
+print(f"추가 후 인원: {len(new_list)}명")
+new_list = add_student(new_list, "김철수", "A", 50, 50, 50)
+print(f"추가 후 인원: {len(new_list)}명")
+
+new_list = update_score(new_list, "김철수", "수학", 150)
+new_list = update_score(new_list, "홍길동", "수학", 90)
+new_list = update_score(new_list, "김철수", "수학", 95)
+
+for s in new_list:
+    if s["이름"] == "김철수":
+        print("김철수 수학:", s["수학"])
+for s in students:
+    if s["이름"] == "김철수":
+        print("원본 김철수 수학:", s["수학"])
+
+new_list = remove_student(new_list, "한지민")
+print(f"삭제 후 인원: {len(new_list)}명")
+print()
+
 # =============================================================
 # 8단계. 전체 리포트
 # =============================================================
@@ -535,6 +602,33 @@ print_warning(students)
 # -------------------------------------------------------------
 # [확인]
 # print_full_report(students)
+
+
+def print_full_report(students):
+  print("=" * 30)
+  print("성적 종합 리포트")
+  print("=" * 30)
+  print(f"전체 인원: {len(students)}명")
+  sum_avg = 0
+  for s in students:
+    totals = get_total(s)
+    avg = get_average(totals)
+    sum_avg += avg
+  all_avg = sum_avg / len(students)
+  print(f"전체 평균: {round(all_avg, 1)}")
+  print()
+  print_report(students)
+  print()
+  print_subject_stats(students)
+  print()
+  print_class_stats(students)
+  print()
+  print_ranking(students)
+  print()
+  print_warning(students)
+
+print_full_report(students)
+
 
 
 # =============================================================

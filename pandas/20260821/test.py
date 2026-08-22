@@ -101,58 +101,73 @@ def get_grade(average):
 # print_warning(students)
 
 
-# 등급별 리스트 리턴 함수
-def find_by_grade(students, grade):
-  grade_ls = []
+def add_student(students, name, class_name, kor, eng, math):
+  # 새로 생성한 빈 리스트에 원본 리스트 복사
+  new_list = []
   for s in students:
-    avg = get_average(get_total(s))
-    if get_grade(avg) == grade:
-      grade_ls.append(s["이름"])
-  return grade_ls
-
-
-def find_failed(students, cutoff=60):
-  # 과락 점수 있는 학생 리스트
-  cutoff_ls = []
+      new_list.append(s.copy())
+  add_stu = {}
   for s in students:
-    # 과락 과목들 담는 리스트
-      f_subjects = []
-      # 각 과락 값들을 과목과 해당 과목 점수(s.get("국어"))를 같이 저장
-      if s.get("국어") < cutoff:
-        f_subjects.append(f"국어({s.get("국어")})")
-      if s.get("영어") < cutoff:
-        f_subjects.append(f"영어({s.get("영어")})")
-      if s.get("수학") < cutoff:
-        f_subjects.append(f"수학({s.get("수학")})")
-
-      if f_subjects:
-        # 과락 과목에 포함된 점수의 학생들과 튜플로
-        # 리스트에 묶어서 담기
-        cutoff_ls.append(
-          (s.get("이름"), f_subjects)
-        )
-  return cutoff_ls
-
-
-def print_warning(students):
-  warning_out = find_failed(students)
-  if len(warning_out) == 0:
-    print("과락자 없음")
+    if s["이름"] == name:
+      print(f"이미 있는 학생: {name}")
+      break
+    add_stu["이름"] = name
+    add_stu["반"] = class_name
+    add_stu["국어"] = kor
+    add_stu["영어"] = eng
+    add_stu["수학"] = math
+  if add_stu: # 'add_stu'에 값이 존재하면 True
+    new_list.append(add_stu)
+    return new_list
   else:
-    print("[과락 경고]")
-    for name, subj in warning_out:
-      print(name, end=" ")
-      for idx, s in enumerate(subj):
-        # 리스트로 묶인 subj 값들을 풀어주기
-        if idx == len(subj) - 1:
-          # idx => 0 1 2
-          # len(subj) = 3 // 1 2 3
-          print(s)
-        else:
-          # 마지막 리스트 값의 다음에 쉼표(,) 붙이기
-          print(s, end=", ")
+    return new_list
 
-print("A등급:", find_by_grade(students, "A"))
-print("F등급:", find_by_grade(students, "F"))
-print()
-print_warning(students)
+def update_score(students, name, subject, score):
+  for s in students:
+    if (s["이름"] == name) is True:
+      if 0 > score or 100 < score:
+        print(f"잘못된 점수: {score}")
+        return students
+      s[subject] = score
+      return students
+  print(f"없는 학생: {name}")
+  return students
+
+
+def remove_student(students, name):
+  for i in students:
+      # 리스트 내 딕셔너리(i) 중 name값과 맞는 것은
+      # 해당 딕셔너리 내용 전부 제거
+      if i.get("이름") == name:
+          i.clear()
+
+  for ls in students:
+      # 제거된 값의 흔적(빈 딕셔너리: {}) 찾아서 삭제 
+      if ls == {}:
+          students.remove(ls)
+  return students
+
+
+
+
+
+
+
+new_list = add_student(students, "한지민", "A", 85, 90, 88)
+print(f"추가 후 인원: {len(new_list)}명")
+new_list = add_student(new_list, "김철수", "A", 50, 50, 50)
+print(f"추가 후 인원: {len(new_list)}명")
+
+new_list = update_score(new_list, "김철수", "수학", 150)
+new_list = update_score(new_list, "홍길동", "수학", 90)
+new_list = update_score(new_list, "김철수", "수학", 95)
+
+for s in new_list:
+    if s["이름"] == "김철수":
+        print("김철수 수학:", s["수학"])
+for s in students:
+    if s["이름"] == "김철수":
+        print("원본 김철수 수학:", s["수학"])
+
+new_list = remove_student(new_list, "한지민")
+print(f"삭제 후 인원: {len(new_list)}명")
