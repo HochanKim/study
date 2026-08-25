@@ -411,7 +411,10 @@ class Library:
     print(f"총 {avail_book_cnt}권")
 
   def search(self, keyword):
-    return True
+    for book in self.having_book.values():
+      if (keyword in book.title) is True:
+        return book
+        
 
 
     
@@ -520,10 +523,10 @@ print()
 # [확인]
 lib.list_books()
 print()
-# lib.borrow("M002", "B001")
+# lib.borrow("M002", "B001") => 대출 도서 적용 여부
 lib.list_books(available_only=True)
-# print()
-# print("검색 '파이썬':", [b.title for b in lib.search("파이썬")])
+print()
+print("검색 '파이썬':", [b.title for b in lib.search("파이썬")])
 # print("분류별:", lib.by_category())
 # print("인기 도서:", [(b.title, b.borrow_count) for b in lib.most_borrowed(2)])
 
