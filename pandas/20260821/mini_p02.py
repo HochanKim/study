@@ -22,9 +22,9 @@
 from pathlib import Path
 import csv
 
-BASE = Path(__file__).parent
-DATA = BASE / "data"
-DATA.mkdir(exist_ok=True)
+# BASE = Path(__file__).parent
+# DATA = BASE / "data"
+# DATA.mkdir(exist_ok=True)
 
 
 # =============================================================
@@ -68,44 +68,49 @@ DATA.mkdir(exist_ok=True)
 # -------------------------------------------------------------
 # [확인]
 class Book:
-  def __init__(self, book_id, title, author, category):
-    self.book_id = book_id
-    self.title = title
-    self.author = author
-    self.category = category
-    #  대출 상태 (처음에는 대출 가능)
-    self.rented = "대출 가능"
-    #   빌린 사람 이름 (처음에는 없음)
-    self.rent_person = ""
-    #   총 대출 횟수 (처음에는 0)
-    self.rent_cnt = 0
+    def __init__(self, book_id, title, author, category):
+        self.book_id = book_id
+        self.title = title
+        self.author = author
+        self.category = category
+        #  대출 상태 (처음에는 대출 가능)
+        self.rented = "대출 가능"
+        #   빌린 사람 이름 (처음에는 없음)
+        self.rent_person = ""
+        #   총 대출 횟수 (처음에는 0)
+        self.rent_cnt = 0
 
-  def borrow(self, who):
-    if self.rent_person == "":
-      self.rent_person = who
-      self.rented = "대출 불가"
-      self.rent_cnt += 1
-      return True
-    else:
-      return False
-  
-  def give_back(self):
-    if self.rented == "대출 가능":
-      return False
-    else:
-      self.rented = "대출 가능"
-      self.rent_person = ""
-      return True
-  
-  def is_available(self):
-    if self.rented == "대출 가능":
-      return True
-  
-  def show(self):
-    if self.rented == "대출 불가":
-      print(f"{self.book_id} {self.title} / {self.author} / 대출 중 ({self.rent_person}) / 누적 {self.rent_cnt}회")
-    elif self.rented == "대출 가능":
-      print(f"{self.book_id} {self.title} / {self.author} / 대출 가능 / 누적 {self.rent_cnt}회")
+    def borrow(self, who):
+        if self.rent_person == "":
+            self.rent_person = who
+            self.rented = "대출 불가"
+            self.rent_cnt += 1
+            return True
+        else:
+            return False
+
+    def give_back(self):
+        if self.rented == "대출 가능":
+            return False
+        else:
+            self.rented = "대출 가능"
+            self.rent_person = ""
+            return True
+
+    def is_available(self):
+        if self.rented == "대출 가능":
+            return True
+
+    def show(self):
+        if self.rented == "대출 불가":
+            print(
+                f"{self.book_id} {self.title} / {self.author} / 대출 중 ({self.rent_person}) / 누적 {self.rent_cnt}회"
+            )
+        elif self.rented == "대출 가능":
+            print(
+                f"{self.book_id} {self.title} / {self.author} / 대출 가능 / 누적 {self.rent_cnt}회"
+            )
+
 
 # [출력]
 #   B001 사피엔스 / 유발 하라리 / 인문 / 대출가능 / 누적 0회
@@ -148,21 +153,24 @@ print()
 #     "E001 파이썬 입문 / 홍길동 / IT / 전자책(15MB) / 누적 3회" 형태
 # -------------------------------------------------------------
 # [확인]
-class EBook (Book):
-  def __init__(self, book_id, title, author, category, file_size):
-    super().__init__(book_id, title, author, category)
-    self.size = file_size
+class EBook(Book):
+    def __init__(self, book_id, title, author, category, file_size):
+        super().__init__(book_id, title, author, category)
+        self.size = file_size
 
-  def borrow(self, who):
-    super().borrow(who)
-    if self.rent_person:
-      self.rent_person = who
-      self.rented = "대출 가능"
-      self.rent_cnt += 1
-      return True
+    def borrow(self, who):
+        super().borrow(who)
+        if self.rent_person:
+            self.rent_person = who
+            self.rented = "대출 가능"
+            self.rent_cnt += 1
+            return True
 
-  def show(self):
-      print(f"{self.book_id} {self.title} / {self.author} / {self.category} / {self.size}MB / 누적 {self.rent_cnt}회")
+    def show(self):
+        print(
+            f"{self.book_id} {self.title} / {self.author} / {self.category} / {self.size}MB / 누적 {self.rent_cnt}회"
+        )
+
 
 # [출력]
 #   E001 파이썬 입문 / 홍길동 / IT / 전자책(15MB) / 누적 0회
@@ -214,41 +222,44 @@ print()
 # -------------------------------------------------------------
 # [확인]
 
-class Member:
-  def __init__(self, member_id, name):
-    self.id = member_id
-    self.name = name
-    # 현재 빌린 책 목록 (처음에는 비어 있음)
-    self._book_list = []
-    # 대출 권수 (최대 3권)
-    self.rented_cnt = 0
 
-  def can_borrow(self):
-    if self.rented_cnt >= 3:  # noqa: RUF100, SIM103
-      return False
-    else:
-      return True
-    
-  def add_book(self, book_id):
-    self._book_list.append(book_id)
-    self.rented_cnt += 1
-    return self._book_list
-  
-  def remove_book(self, book_id):
-    self._book_list.remove(book_id)
-    if len(self._book_list) == 0:
-      return False
-  
-  def get_books(self):
-    get_ls = []
-    for books in self._book_list:
-      if len(self._book_list) > 3:
-        return False
-      get_ls.append(books) 
-    return get_ls
-  
-  def show(self):
-    print(f"{self.id} {self.name} / 대출 {len(self._book_list)}권 / {self._book_list}")
+class Member:
+    def __init__(self, member_id, name):
+        self.id = member_id
+        self.name = name
+        # 현재 빌린 책 목록 (처음에는 비어 있음)
+        self._book_list = []
+        # 대출 권수 (최대 3권)
+        self.rented_cnt = 0
+
+    def can_borrow(self):
+        if self.rented_cnt >= 3:  # noqa: RUF100, SIM103
+            return False
+        else:
+            return True
+
+    def add_book(self, book_id):
+        self._book_list.append(book_id)
+        self.rented_cnt += 1
+        return self._book_list
+
+    def remove_book(self, book_id):
+        self._book_list.remove(book_id)
+        if len(self._book_list) == 0:
+            return False
+
+    def get_books(self):
+        get_ls = []
+        for books in self._book_list:
+            if len(self._book_list) > 3:
+                return False
+            get_ls.append(books)
+        return get_ls
+
+    def show(self):
+        print(
+            f"{self.id} {self.name} / 대출 {len(self._book_list)}권 / {self._book_list}"
+        )
 
 
 # [출력]
@@ -305,119 +316,121 @@ print()
 # -------------------------------------------------------------
 # [확인]
 
+
 class Library:
-  def __init__(self, name):
-    self.name = name
-    # 도서 목록
-    self.having_book = {}
-    # 회원 목록
-    self.member = {}
-    # 대출 기록
-    self.record = []
+    def __init__(self, name):
+        self.name = name
+        # 도서 목록
+        self.having_book = {}
+        # 회원 목록
+        self.member = {}
+        # 대출 기록
+        self.record = []
 
-  def add_book(self, book):
-    # 책 추가
-    if (book.book_id in self.having_book) is False:
-      self.having_book[book.book_id] = book
-      print(self.having_book[book.book_id].rented)
-      return True
-    # 이미 있는 책일 경우 (책 번호 중복 시)
-    return False
+    def add_book(self, book):
+        # 책 추가
+        if (book.book_id in self.having_book) is False:
+            self.having_book[book.book_id] = book
+            print(self.having_book[book.book_id].rented)
+            return True
+        # 이미 있는 책일 경우 (책 번호 중복 시)
+        return False
 
-  def add_member(self, member):
-    # 회원 추가
-    if (member.id in self.member) is False:
-          self.member[member.id] = member
-          # print(self.member[member.id].name)
-          return True
-    # 이미 있는 회원일 경우 (회원 번호 중복 시)
-    return False
+    def add_member(self, member):
+        # 회원 추가
+        if (member.id in self.member) is False:
+            self.member[member.id] = member
+            # print(self.member[member.id].name)
+            return True
+        # 이미 있는 회원일 경우 (회원 번호 중복 시)
+        return False
 
-  def find_book(self, book_id):
-    # 도서 찾기
-    if (book_id in self.having_book) is True:
-      return self.having_book.get(book_id)
-    return None
-    
+    def find_book(self, book_id):
+        # 도서 찾기
+        if (book_id in self.having_book) is True:
+            return self.having_book.get(book_id)
+        return None
 
-  def find_member(self, member_id):
-    # 회원 찾기
-    if (member_id in self.member) is True:
-          return self.member.get(member_id)
-    return None
+    def find_member(self, member_id):
+        # 회원 찾기
+        if (member_id in self.member) is True:
+            return self.member.get(member_id)
+        return None
 
-  def count(self):
-    # 등록된 책과 회원 수
-    books_cnt = len(self.having_book)
-    members_cnt = len(self.member)
-    return books_cnt, members_cnt
+    def count(self):
+        # 등록된 책과 회원 수
+        books_cnt = len(self.having_book)
+        members_cnt = len(self.member)
+        return books_cnt, members_cnt
 
-  def borrow(self, member_id, book_id):
-    # 대여 여부
-    if (member_id in self.member) is False:
-      print(f"없는 회원: {member_id}")
-      return False
+    def borrow(self, member_id, book_id):
+        # 대여 여부
+        if (member_id in self.member) is False:
+            print(f"없는 회원: {member_id}")
+            return False
 
-    if (book_id in self.having_book) is False:
-      print(f"없는 도서: {book_id}")
-      return False
+        if (book_id in self.having_book) is False:
+            print(f"없는 도서: {book_id}")
+            return False
 
-    # 각 클래스의 객체 가져오기
-    member = self.member[member_id]
-    book = self.having_book[book_id]
+        # 각 클래스의 객체 가져오기
+        member = self.member[member_id]
+        book = self.having_book[book_id]
 
-    if member.rented_cnt >= 3 :
-      print(f"대출 한도 초과: {member.name} (3권)")
-      return False
+        if member.rented_cnt >= 3:
+            print(f"대출 한도 초과: {member.name} (3권)")
+            return False
 
-    if book.borrow(member.name):
-      # 클래스 Book의 매서드 borrow 호출
-      self.detail = {}
-      self.detail["구분"] = "대출"
-      self.detail["회원"] = member.name
-      self.detail["도서"] = book.title
+        if book.borrow(member.name):
+            # 클래스 Book의 매서드 borrow 호출
+            self.detail = {}
+            self.detail["구분"] = "대출"
+            self.detail["회원"] = member.name
+            self.detail["도서"] = book.title
 
-      self.record.append(self.detail)
+            self.record.append(self.detail)
 
-      print(f"{member.name} -> {book.title} 대출 완료")
-      return True
-    print(f"이미 대출 중 => {book.title}")
-    return False
+            print(f"{member.name} -> {book.title} 대출 완료")
+            return True
+        print(f"이미 대출 중 => {book.title}")
+        return False
 
-  def give_back(self, member_id, book_id):
-    # 각 클래스의 객체 가져오기
-    member = self.member[member_id]
-    book = self.having_book[book_id]
-    for b in self.record:
-      if b.get("도서") == self.having_book.get(book_id).title :
-        book.give_back()
-        self.record.remove(b)
-        print(f"{member.name} -> {book.title} 반납 완료")
+    def give_back(self, member_id, book_id):
+        # 각 클래스의 객체 가져오기
+        member = self.member[member_id]
+        book = self.having_book[book_id]
+        for b in self.record:
+            if b.get("도서") == self.having_book.get(book_id).title:
+                book.give_back()
+                self.record.remove(b)
+                print(f"{member.name} -> {book.title} 반납 완료")
+                return True
+        print(f"빌린 책이 아닙니다: {self.having_book.get(book_id).title}")
+
+        for dicts in self.record:
+            if b == {}:
+                self.record.remove(dicts)
+
+    def list_books(self, available_only=False):
+        print("[중앙도서관 도서 목록]")
+        avail_book_cnt = 0
+        for book in self.having_book.values():
+            if available_only and not book.is_available():
+                continue
+            book.show()
+            avail_book_cnt += 1
+        print(f"총 {avail_book_cnt}권")
+
+    def search(self, keyword):
+        # 빈 리스트 설정
+        book_info_ls = []
+        for book in self.having_book.values():
+            if keyword in (book.title or book.author):
+                book_info_ls.append(book)
+        return book_info_ls
+
+    def by_category():
         return True
-    print(f"빌린 책이 아닙니다: {self.having_book.get(book_id).title}") 
-        
-    for dicts in self.record:
-      if b == {}:
-        self.record.remove(dicts)
-
-  def list_books(self, available_only=False):
-    print("[중앙도서관 도서 목록]")
-    avail_book_cnt = 0
-    for book in self.having_book.values():
-      if available_only and not book.is_available():
-        continue
-      book.show()
-      avail_book_cnt += 1 
-    print(f"총 {avail_book_cnt}권")
-
-  def search(self, keyword):
-    for book in self.having_book.values():
-      if (keyword in book.title) is True:
-        return book
-        
-
-
-    
 
 
 # [출력]

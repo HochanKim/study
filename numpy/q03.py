@@ -141,7 +141,7 @@ temp = np.array(
 #             [71.2 75.9 66.3]]
 
 print("문제 1. 2차원 슬라이싱 두 방향 동시에")
-reversed_temps = temp[::-1, :] # 2차원 배열 슬라이싱
+reversed_temps = temp[::-1, :]  # 2차원 배열 슬라이싱
 # print(reversed_temps)
 print(reversed_temps[:, ::2])
 print()
@@ -217,8 +217,6 @@ print(np.array([one_last, two_last, three_last]))
 print()
 
 
-
-
 # ----------------------------------------
 # 문제 6. 시점마다 다른 기준선
 # ----------------------------------------
@@ -230,7 +228,6 @@ print("문제 6. 시점마다 다른 기준선")
 stnd = np.linspace(70, 78, 5)
 print((temp > stnd).sum(axis=0))
 print()
-
 
 
 # ----------------------------------------
