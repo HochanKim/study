@@ -22,9 +22,9 @@
 from pathlib import Path
 import csv
 
-# BASE = Path(__file__).parent
-# DATA = BASE / "data"
-# DATA.mkdir(exist_ok=True)
+BASE = Path(__file__).parent
+DATA = BASE / "data"
+DATA.mkdir(exist_ok=True)
 
 
 # =============================================================
@@ -78,13 +78,13 @@ class Book:
         #   빌린 사람 이름 (처음에는 없음)
         self.rent_person = ""
         #   총 대출 횟수 (처음에는 0)
-        self.rent_cnt = 0
+        self.borrow_count = 0
 
     def borrow(self, who):
         if self.rent_person == "":
             self.rent_person = who
-            self.rented = "대출 불가"
-            self.rent_cnt += 1
+            self.rented = "대출 중"
+            self.borrow_count += 1
             return True
         else:
             return False
@@ -101,14 +101,25 @@ class Book:
         if self.rented == "대출 가능":
             return True
 
+    def to_row(self):
+        # csv 파일 등으로 내용들을 내보내기 위한 메서드 생성
+        return {
+            "도서번호": self.book_id,
+            "제목": self.title,
+            "저자": self.author,
+            "분류": self.category,
+            "상태": self.rented,
+            "누적대출": self.borrow_count,
+        }
+
     def show(self):
-        if self.rented == "대출 불가":
+        if self.rented == "대출 중":
             print(
-                f"{self.book_id} {self.title} / {self.author} / 대출 중 ({self.rent_person}) / 누적 {self.rent_cnt}회"
+                f"{self.book_id} {self.title} / {self.author} / 대출 중 ({self.rent_person}) / 누적 {self.borrow_count}회"
             )
         elif self.rented == "대출 가능":
             print(
-                f"{self.book_id} {self.title} / {self.author} / 대출 가능 / 누적 {self.rent_cnt}회"
+                f"{self.book_id} {self.title} / {self.author} / 대출 가능 / 누적 {self.borrow_count}회"
             )
 
 
@@ -163,12 +174,12 @@ class EBook(Book):
         if self.rent_person:
             self.rent_person = who
             self.rented = "대출 가능"
-            self.rent_cnt += 1
+            self.borrow_count += 1
             return True
 
     def show(self):
         print(
-            f"{self.book_id} {self.title} / {self.author} / {self.category} / {self.size}MB / 누적 {self.rent_cnt}회"
+            f"{self.book_id} {self.title} / {self.author} / {self.category} / {self.size}MB / 누적 {self.borrow_count}회"
         )
 
 
@@ -256,6 +267,14 @@ class Member:
             get_ls.append(books)
         return get_ls
 
+    def to_row(self):
+        # csv 파일 등으로 내용들을 내보내기 위한 메서드 생성
+        return {
+            "구분": self.id,
+            "회원": self.name,
+            "도서": self._book_list,
+        }
+
     def show(self):
         print(
             f"{self.id} {self.name} / 대출 {len(self._book_list)}권 / {self._book_list}"
@@ -331,7 +350,7 @@ class Library:
         # 책 추가
         if (book.book_id in self.having_book) is False:
             self.having_book[book.book_id] = book
-            print(self.having_book[book.book_id].rented)
+            # print(self.having_book[book.book_id].rented)
             return True
         # 이미 있는 책일 경우 (책 번호 중복 시)
         return False
@@ -359,9 +378,9 @@ class Library:
 
     def count(self):
         # 등록된 책과 회원 수
-        books_cnt = len(self.having_book)
-        members_cnt = len(self.member)
-        return books_cnt, members_cnt
+        book_cnt = len(self.having_book)
+        member_cnt = len(self.member)
+        return book_cnt, member_cnt
 
     def borrow(self, member_id, book_id):
         # 대여 여부
@@ -429,8 +448,106 @@ class Library:
                 book_info_ls.append(book)
         return book_info_ls
 
-    def by_category():
-        return True
+    def by_category(self):
+        cate_dict = {}
+        for book in self.having_book.values():
+            if book.category in cate_dict:
+                cate_dict[book.category] += 1
+            else:
+                cate_dict[book.category] = 1
+        return cate_dict
+
+    def most_borrowed(self, n=3):
+        sorted_list = sorted(
+            self.having_book.values(), key=lambda book: book.borrow_count, reverse=True
+        )
+        return sorted_list[:n]
+
+    def save_books(self, path):
+        # 원소를 하나씩 꺼내는 next()
+        # 객체를 반복 가능하게 해주는 iter()
+        sample_book = next(iter(self.having_book.values()))
+        fieldnames = list(sample_book.to_row().keys())
+        rows = [book.to_row() for book in self.having_book.values()]
+        with open(path, "w", encoding="utf-8-sig", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(rows)
+        return path
+
+    def save_history(self, path):
+        sample_member = next(iter(self.member.values()))
+        fieldnames = list(sample_member.to_row().keys())
+        rows = [member.to_row() for member in self.member.values()]
+        with open(path, "w", encoding="utf-8-sig", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(rows)
+        return path
+
+    def load_books(self, path):
+        try:
+            with open(path, "r", encoding="utf-8-sig", newline="") as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    book = Book(row["도서번호"], row["제목"], row["저자"], row["분류"])
+
+                    self.add_book(book)
+                return len(self.having_book)
+        except FileNotFoundError:
+            print(f"파일이 없습니다: {path}")
+            return 0
+
+    def report(self):
+        print("=" * 44)
+        print(" 중앙도서관 운영 리포트")
+        print("=" * 44)
+
+        # 도서 / 회원 수
+        books, members = self.count()
+        print(f"도서 {books}권 / 회원 {members}명")
+
+        # 대출 가능 / 대출 중
+        available = 0
+        rented = 0
+
+        for book in self.having_book.values():
+            if book.is_available():
+                available += 1
+            else:
+                rented += 1
+
+        print(f"대출 가능 {available}권 / 대출 중 {rented}권")
+
+        # 분류별
+        print("\n[분류별]")
+
+        categories = self.by_category()
+
+        for category in sorted(categories):
+            print(f"  {category} {categories[category]}권")
+
+        # 인기 도서
+        print("\n[인기 도서]")
+
+        popular_books = self.most_borrowed(2)
+
+        for idx, book in enumerate(popular_books, start=1):
+            print(f"  {idx}. {book.title} ({book.borrow_count}회)")
+
+        # 회원 현황
+        print("\n[회원 현황]")
+
+        for member in self.member.values():
+            print(f"  {member.id} {member.name} / 대출 {member.rented_cnt}권")
+
+        # 최근 기록
+        print("\n[최근 기록]")
+
+        for record in self.record:
+            print(f"  {record['구분']} {record['회원']} -> {record['도서']}")
+
+        print("=" * 44)
 
 
 # [출력]
@@ -540,9 +657,9 @@ print()
 lib.list_books(available_only=True)
 print()
 print("검색 '파이썬':", [b.title for b in lib.search("파이썬")])
-# print("분류별:", lib.by_category())
-# print("인기 도서:", [(b.title, b.borrow_count) for b in lib.most_borrowed(2)])
-
+print("분류별:", lib.by_category())
+print("인기 도서:", [(b.title, b.borrow_count) for b in lib.most_borrowed(2)])
+print()
 
 # =============================================================
 # 7단계. CSV 로 저장하기
@@ -572,15 +689,14 @@ print("검색 '파이썬':", [b.title for b in lib.search("파이썬")])
 #   ['B001', '사피엔스', '유발 하라리', '인문', '대출가능', '1']
 #   ...
 
-# p1 = lib.save_books(DATA / "books.csv")
-# print("저장 완료:", p1.name)
-# p2 = lib.save_history(DATA / "history.csv")
-# print("저장 완료:", p2.name)
-#
-# with open(DATA / "books.csv", "r", encoding="utf-8-sig", newline="") as f:
-#     for row in csv.reader(f):
-#         print(row)
-
+p1 = lib.save_books(DATA / "books.csv")
+print("저장 완료:", p1.name)
+p2 = lib.save_history(DATA / "history.csv")
+print("저장 완료:", p2.name)
+with open(DATA / "books.csv", "r", encoding="utf-8-sig", newline="") as f:
+    for row in csv.reader(f):
+        print(row)
+print()
 
 # =============================================================
 # 8단계. CSV 에서 불러오기
@@ -608,11 +724,11 @@ print("검색 '파이썬':", [b.title for b in lib.search("파이썬")])
 #   불러온 도서: 3권
 #   새 도서관 도서 수: 3
 
-# lib2 = Library("분관")
-# print("불러온 도서:", lib2.load_books(DATA / "없는파일.csv"), "권")
-# print("불러온 도서:", lib2.load_books(DATA / "books.csv"), "권")
-# books, members = lib2.count()
-# print("새 도서관 도서 수:", books)
+lib2 = Library("분관")
+print("불러온 도서:", lib2.load_books(DATA / "없는파일.csv"), "권")
+print("불러온 도서:", lib2.load_books(DATA / "books.csv"), "권")
+books, members = lib2.count()
+print("새 도서관 도서 수:", books)
 
 
 # =============================================================
@@ -651,7 +767,7 @@ print("검색 '파이썬':", [b.title for b in lib.search("파이썬")])
 #     앞에서 만든 메서드들을 재사용하세요.
 # -------------------------------------------------------------
 # [확인]
-# lib.report()
+lib.report()
 
 
 # =============================================================

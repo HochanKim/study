@@ -72,28 +72,31 @@ SUBJECTS = ["국어", "영어", "수학"]
 #     avg = get_average(s)
 #     print(f"{s['이름']}  총점 {get_total(s)}  평균 {avg}  등급 {get_grade(avg)}")
 
+
 # 합계 함수
 def get_total(student):
-  sum_scores = student.get("국어") + student.get("영어") + student.get("수학")
-  return sum_scores
+    sum_scores = student.get("국어") + student.get("영어") + student.get("수학")
+    return sum_scores
+
 
 # 평균 함수
 def get_average(student):
-  set_avg = round(student / len(SUBJECTS), 1)
-  return set_avg
+    set_avg = round(student / len(SUBJECTS), 1)
+    return set_avg
+
 
 # 등급 함수
 def get_grade(average):
-  if average >= 90:
-    return "A"
-  elif average >= 80:
-    return "B"
-  elif average >= 70:
-    return "C"
-  elif average >= 60:
-    return "D"
-  else:
-    return "F"
+    if average >= 90:
+        return "A"
+    elif average >= 80:
+        return "B"
+    elif average >= 70:
+        return "C"
+    elif average >= 60:
+        return "D"
+    else:
+        return "F"
 
 
 for s in [students[0], students[1], students[7]]:
@@ -122,30 +125,32 @@ print()
 # print_report(students)
 
 for d in students:
-  # 총점, 평균, 등급 추가 (각 딕셔너리에)
-  d["총점"] = get_total(d)
-  d["평균"] = get_average(d["총점"])
-  d["등급"] = get_grade(d["평균"])
+    # 총점, 평균, 등급 추가 (각 딕셔너리에)
+    d["총점"] = get_total(d)
+    d["평균"] = get_average(d["총점"])
+    d["등급"] = get_grade(d["평균"])
+
 
 def print_report(students):
-  for i in students:
-    # 키값들을 리스트화
-    keys_ls = list(i.keys())
+    for i in students:
+        # 키값들을 리스트화
+        keys_ls = list(i.keys())
 
-  for k in keys_ls:
-    # 리스트에 담은 키값들 풀기
-    print(f"{k:<5}", end=" ")
-  print()
-  print("-"*60)
-  # 학생 정보 리스트를 파라미터로 전달 받아
-  for i in students:
-    # 밸류값들을 리스트화
-    v_ls = list(i.values())
-    for v in v_ls:
-      # 리스트에 담은 밸류값들을 나열하기
-      print(f"{v:<8}", end="")
-    # 리스트 덩어리에 맞게 줄바꿈
+    for k in keys_ls:
+        # 리스트에 담은 키값들 풀기
+        print(f"{k:<5}", end=" ")
     print()
+    print("-" * 60)
+    # 학생 정보 리스트를 파라미터로 전달 받아
+    for i in students:
+        # 밸류값들을 리스트화
+        v_ls = list(i.values())
+        for v in v_ls:
+            # 리스트에 담은 밸류값들을 나열하기
+            print(f"{v:<8}", end="")
+        # 리스트 덩어리에 맞게 줄바꿈
+        print()
+
 
 print_report(students)
 print()
@@ -176,28 +181,30 @@ print()
 
 
 def subject_average(students, subject):
-  subj_sum = 0
-  for s in students:
-    subj_sum += s.get(subject)
-  subj_avg = subj_sum / len(students)
-  return round(subj_avg, 1)
+    subj_sum = 0
+    for s in students:
+        subj_sum += s.get(subject)
+    subj_avg = subj_sum / len(students)
+    return round(subj_avg, 1)
+
 
 def subject_max(students, subject):
-  max_num = 0
-  max_stu = ""
-  for s in students:
-    if s.get(subject) > max_num:
-      max_num = s.get(subject)
-      max_stu = s.get("이름")
-  return max_stu, max_num
+    max_num = 0
+    max_stu = ""
+    for s in students:
+        if s.get(subject) > max_num:
+            max_num = s.get(subject)
+            max_stu = s.get("이름")
+    return max_stu, max_num
 
 
 def print_subject_stats(students):
-  # SUBJECTS 리스트를 활용한 for문으로 각각 함수로 파라미터 전달
-  for subject in SUBJECTS:
-    avg = subject_average(students, subject)
-    name, score = subject_max(students, subject)
-    print(f"{subject}  평균 {avg}  최고 {name}({score})")
+    # SUBJECTS 리스트를 활용한 for문으로 각각 함수로 파라미터 전달
+    for subject in SUBJECTS:
+        avg = subject_average(students, subject)
+        name, score = subject_max(students, subject)
+        print(f"{subject}  평균 {avg}  최고 {name}({score})")
+
 
 print_subject_stats(students)
 print()
@@ -234,44 +241,46 @@ print()
 # print("김철수의 등수:", get_rank(students, "김철수"))
 # print("없는사람의 등수:", get_rank(students, "없는사람"))
 
+
 def get_rank(students, name):
-  # 이름 등록 여부 변수
-  check_name = None
-  for stu in students:
-    if stu["이름"] == name:
-      check_name = stu
-      break
-  if check_name is None:
-    # 존재하지 않으면 None으로 반환
-    return None
-  # 평균 함수에 보낼 합계
-  total = get_total(check_name)
-  # 찾는 학생의 평균 구하기
-  avg = get_average(total)
+    # 이름 등록 여부 변수
+    check_name = None
+    for stu in students:
+        if stu["이름"] == name:
+            check_name = stu
+            break
+    if check_name is None:
+        # 존재하지 않으면 None으로 반환
+        return None
+    # 평균 함수에 보낼 합계
+    total = get_total(check_name)
+    # 찾는 학생의 평균 구하기
+    avg = get_average(total)
 
-  # 평균 비교를 위한 변수
-  over_avg_cnt = 1
+    # 평균 비교를 위한 변수
+    over_avg_cnt = 1
 
-  for stu in students:
-    # 리스트 내 학생들의 합계
-    stu_total = get_total(stu)
-    if get_average(stu_total) > avg:
-      over_avg_cnt += 1
+    for stu in students:
+        # 리스트 내 학생들의 합계
+        stu_total = get_total(stu)
+        if get_average(stu_total) > avg:
+            over_avg_cnt += 1
 
-  # 평균이 높은 사람 최종 카운트를 등수로 return
-  return f"{over_avg_cnt}등"
+    # 평균이 높은 사람 최종 카운트를 등수로 return
+    return f"{over_avg_cnt}등"
+
 
 def print_ranking(students):
-  # 정렬식
-  sorted_students = sorted(
-    students, key=lambda stu: get_average(get_total(stu)), reverse=True
-  )
+    # 정렬식
+    sorted_students = sorted(
+        students, key=lambda stu: get_average(get_total(stu)), reverse=True
+    )
 
-  print("[전체 등수]")
-  # 등수 출력을 위한 enumerate for문
-  # 1등부터 체크 (start=1)
-  for idx, sort in enumerate(sorted_students, start=1):
-    print(f"{idx}등 {sort.get("이름")} {get_average(get_total(sort))}")
+    print("[전체 등수]")
+    # 등수 출력을 위한 enumerate for문
+    # 1등부터 체크 (start=1)
+    for idx, sort in enumerate(sorted_students, start=1):
+        print(f"{idx}등 {sort.get('이름')} {get_average(get_total(sort))}")
 
 
 print_ranking(students)
@@ -302,64 +311,66 @@ print()
 # [확인]
 # print_class_stats(students)
 
+
 def group_by_class(students):
-  class_divid = {}
-  for i in students:
-    class_name = i.get("반")
-    if (class_name in class_divid) is True:
-      # 값이 딕셔너리에 존재하면 "이름"의 밸류를 딕셔너리 내 리스트에 추가
-      class_divid[class_name].append(i)
-    else:
-      # 값이 없으면 "이름"의 밸류를 리스트로 만들어서 추가
-      class_divid[class_name] = [i]
-  return class_divid
+    class_divid = {}
+    for i in students:
+        class_name = i.get("반")
+        if (class_name in class_divid) is True:
+            # 값이 딕셔너리에 존재하면 "이름"의 밸류를 딕셔너리 내 리스트에 추가
+            class_divid[class_name].append(i)
+        else:
+            # 값이 없으면 "이름"의 밸류를 리스트로 만들어서 추가
+            class_divid[class_name] = [i]
+    return class_divid
+
 
 def print_class_stats(students):
-  class_a = group_by_class(students).get('A')
-  class_a_sum = 0
-  a_avg_d = {}
-  for a in class_a:
-      # A반 합계
-      a_totals = get_total(a)
-      # A반 전체 평균
-      a_avgs = get_average(a_totals)
-      # A반 학생 성적을 딕셔너리로 저장
-      a_avg_d[a.get("이름")] = a_avgs
-      class_a_sum += a_avgs
-  class_a_avg = round(class_a_sum / len(class_a), 1)
+    class_a = group_by_class(students).get("A")
+    class_a_sum = 0
+    a_avg_d = {}
+    for a in class_a:
+        # A반 합계
+        a_totals = get_total(a)
+        # A반 전체 평균
+        a_avgs = get_average(a_totals)
+        # A반 학생 성적을 딕셔너리로 저장
+        a_avg_d[a.get("이름")] = a_avgs
+        class_a_sum += a_avgs
+    class_a_avg = round(class_a_sum / len(class_a), 1)
 
-  a_max_num = 0 # 최고 평균 점수
-  a_max_stu = ""  # 최고 평균 학생 이름
-  for p in a_avg_d:
-      if a_avg_d.get(p) > a_max_num:
-          a_max_num = a_avg_d.get(p)
-          a_max_stu = p
+    a_max_num = 0  # 최고 평균 점수
+    a_max_stu = ""  # 최고 평균 학생 이름
+    for p in a_avg_d:
+        if a_avg_d.get(p) > a_max_num:
+            a_max_num = a_avg_d.get(p)
+            a_max_stu = p
 
-  class_b = group_by_class(students).get('B')
-  class_b_sum = 0
-  b_avg_d = {}
-  for b in class_b:
-      # B반 합계
-      b_totals = get_total(b)
-      # B반 전체 평균
-      b_avgs = get_average(b_totals)
-      # B반 학생 성적을 딕셔너리로 저장
-      b_avg_d[b.get("이름")] = b_avgs
-      class_b_sum += b_avgs
-  class_b_avg = round(class_b_sum / len(class_b), 1)
+    class_b = group_by_class(students).get("B")
+    class_b_sum = 0
+    b_avg_d = {}
+    for b in class_b:
+        # B반 합계
+        b_totals = get_total(b)
+        # B반 전체 평균
+        b_avgs = get_average(b_totals)
+        # B반 학생 성적을 딕셔너리로 저장
+        b_avg_d[b.get("이름")] = b_avgs
+        class_b_sum += b_avgs
+    class_b_avg = round(class_b_sum / len(class_b), 1)
 
-  b_max_num = 0 # 최고 평균 점수
-  b_max_stu = ""  # 최고 평균 학생 이름
-  for p in b_avg_d:
-      if b_avg_d.get(p) > b_max_num:
-          b_max_num = b_avg_d.get(p)
-          b_max_stu = p
+    b_max_num = 0  # 최고 평균 점수
+    b_max_stu = ""  # 최고 평균 학생 이름
+    for p in b_avg_d:
+        if b_avg_d.get(p) > b_max_num:
+            b_max_num = b_avg_d.get(p)
+            b_max_stu = p
 
+    print("[반별 통계]")
+    #         A반  4명  평균 85.2  최고 김철수(91.7)
+    print(f"A반 {len(class_a)}명 평균 {class_a_avg} 최고 {a_max_stu}({a_max_num})")
+    print(f"B반 {len(class_b)}명 평균 {class_b_avg} 최고 {b_max_stu}({b_max_num})")
 
-  print("[반별 통계]")
-  #         A반  4명  평균 85.2  최고 김철수(91.7)
-  print(f"A반 {len(class_a)}명 평균 {class_a_avg} 최고 {a_max_stu}({a_max_num})")
-  print(f"B반 {len(class_b)}명 평균 {class_b_avg} 최고 {b_max_stu}({b_max_num})")
 
 print_class_stats(students)
 print()
@@ -393,56 +404,56 @@ print()
 # print()
 # print_warning(students)
 
+
 # 등급별 리스트 리턴 함수
 def find_by_grade(students, grade):
-  grade_ls = []
-  for s in students:
-    avg = get_average(get_total(s))
-    if get_grade(avg) == grade:
-      grade_ls.append(s["이름"])
-  return grade_ls
+    grade_ls = []
+    for s in students:
+        avg = get_average(get_total(s))
+        if get_grade(avg) == grade:
+            grade_ls.append(s["이름"])
+    return grade_ls
 
 
 def find_failed(students, cutoff=60):
-  # 과락 점수 있는 학생 리스트
-  cutoff_ls = []
-  for s in students:
-    # 과락 과목들 담는 리스트
-      f_subjects = []
-      # 각 과락 값들을 과목과 해당 과목 점수(s.get("국어"))를 같이 저장
-      if s.get("국어") < cutoff:
-        f_subjects.append(f"국어({s.get("국어")})")
-      if s.get("영어") < cutoff:
-        f_subjects.append(f"영어({s.get("영어")})")
-      if s.get("수학") < cutoff:
-        f_subjects.append(f"수학({s.get("수학")})")
+    # 과락 점수 있는 학생 리스트
+    cutoff_ls = []
+    for s in students:
+        # 과락 과목들 담는 리스트
+        f_subjects = []
+        # 각 과락 값들을 과목과 해당 과목 점수(s.get("국어"))를 같이 저장
+        if s.get("국어") < cutoff:
+            f_subjects.append(f"국어({s.get('국어')})")
+        if s.get("영어") < cutoff:
+            f_subjects.append(f"영어({s.get('영어')})")
+        if s.get("수학") < cutoff:
+            f_subjects.append(f"수학({s.get('수학')})")
 
-      if f_subjects:
-        # 과락 과목에 포함된 점수의 학생들과 튜플로
-        # 리스트에 묶어서 담기
-        cutoff_ls.append(
-          (s.get("이름"), f_subjects)
-        )
-  return cutoff_ls
+        if f_subjects:
+            # 과락 과목에 포함된 점수의 학생들과 튜플로
+            # 리스트에 묶어서 담기
+            cutoff_ls.append((s.get("이름"), f_subjects))
+    return cutoff_ls
 
 
 def print_warning(students):
-  warning_out = find_failed(students)
-  if len(warning_out) == 0:
-    print("과락자 없음")
-  else:
-    print("[과락 경고]")
-    for name, subj in warning_out:
-      print(name, end=" ")
-      for idx, s in enumerate(subj):
-        # 리스트로 묶인 subj 값들을 풀어주기
-        if idx == len(subj) - 1:
-          # idx => 0 1 2
-          # len(subj) = 3 // 1 2 3
-          print(s)
-        else:
-          # 마지막 리스트 값의 다음에 쉼표(,) 붙이기
-          print(s, end=", ")
+    warning_out = find_failed(students)
+    if len(warning_out) == 0:
+        print("과락자 없음")
+    else:
+        print("[과락 경고]")
+        for name, subj in warning_out:
+            print(name, end=" ")
+            for idx, s in enumerate(subj):
+                # 리스트로 묶인 subj 값들을 풀어주기
+                if idx == len(subj) - 1:
+                    # idx => 0 1 2
+                    # len(subj) = 3 // 1 2 3
+                    print(s)
+                else:
+                    # 마지막 리스트 값의 다음에 쉼표(,) 붙이기
+                    print(s, end=", ")
+
 
 print("A등급:", find_by_grade(students, "A"))
 print("F등급:", find_by_grade(students, "F"))
@@ -505,50 +516,51 @@ print()
 
 
 def add_student(students, name, class_name, kor, eng, math):
-  # 새로 생성한 빈 리스트에 원본 리스트 복사
-  new_list = []
-  for s in students:
-      new_list.append(s.copy())
-  add_stu = {}
-  for s in students:
-    if s["이름"] == name:
-      print(f"이미 있는 학생: {name}")
-      break
-    add_stu["이름"] = name
-    add_stu["반"] = class_name
-    add_stu["국어"] = kor
-    add_stu["영어"] = eng
-    add_stu["수학"] = math
-  if add_stu: # 'add_stu'에 값이 존재하면 True
-    new_list.append(add_stu)
-    return new_list
-  else:
-    return new_list
+    # 새로 생성한 빈 리스트에 원본 리스트 복사
+    new_list = []
+    for s in students:
+        new_list.append(s.copy())
+    add_stu = {}
+    for s in students:
+        if s["이름"] == name:
+            print(f"이미 있는 학생: {name}")
+            break
+        add_stu["이름"] = name
+        add_stu["반"] = class_name
+        add_stu["국어"] = kor
+        add_stu["영어"] = eng
+        add_stu["수학"] = math
+    if add_stu:  # 'add_stu'에 값이 존재하면 True
+        new_list.append(add_stu)
+        return new_list
+    else:
+        return new_list
+
 
 def update_score(students, name, subject, score):
-  for s in students:
-    if (s["이름"] == name) is True:
-      if 0 > score or 100 < score:
-        print(f"잘못된 점수: {score}")
-        return students
-      s[subject] = score
-      return students
-  print(f"없는 학생: {name}")
-  return students
+    for s in students:
+        if (s["이름"] == name) is True:
+            if 0 > score or 100 < score:
+                print(f"잘못된 점수: {score}")
+                return students
+            s[subject] = score
+            return students
+    print(f"없는 학생: {name}")
+    return students
 
 
 def remove_student(students, name):
-  for i in students:
-      # 리스트 내 딕셔너리(i) 중 name값과 맞는 것은
-      # 해당 딕셔너리 내용 전부 제거
-      if i.get("이름") == name:
-          i.clear()
+    for i in students:
+        # 리스트 내 딕셔너리(i) 중 name값과 맞는 것은
+        # 해당 딕셔너리 내용 전부 제거
+        if i.get("이름") == name:
+            i.clear()
 
-  for ls in students:
-      # 제거된 값의 흔적(빈 딕셔너리: {}) 찾아서 삭제 
-      if ls == {}:
-          students.remove(ls)
-  return students
+    for ls in students:
+        # 제거된 값의 흔적(빈 딕셔너리: {}) 찾아서 삭제
+        if ls == {}:
+            students.remove(ls)
+    return students
 
 
 new_list = add_student(students, "한지민", "A", 85, 90, 88)
@@ -605,30 +617,30 @@ print()
 
 
 def print_full_report(students):
-  print("=" * 30)
-  print("성적 종합 리포트")
-  print("=" * 30)
-  print(f"전체 인원: {len(students)}명")
-  sum_avg = 0
-  for s in students:
-    totals = get_total(s)
-    avg = get_average(totals)
-    sum_avg += avg
-  all_avg = sum_avg / len(students)
-  print(f"전체 평균: {round(all_avg, 1)}")
-  print()
-  print_report(students)
-  print()
-  print_subject_stats(students)
-  print()
-  print_class_stats(students)
-  print()
-  print_ranking(students)
-  print()
-  print_warning(students)
+    print("=" * 30)
+    print("성적 종합 리포트")
+    print("=" * 30)
+    print(f"전체 인원: {len(students)}명")
+    sum_avg = 0
+    for s in students:
+        totals = get_total(s)
+        avg = get_average(totals)
+        sum_avg += avg
+    all_avg = sum_avg / len(students)
+    print(f"전체 평균: {round(all_avg, 1)}")
+    print()
+    print_report(students)
+    print()
+    print_subject_stats(students)
+    print()
+    print_class_stats(students)
+    print()
+    print_ranking(students)
+    print()
+    print_warning(students)
+
 
 print_full_report(students)
-
 
 
 # =============================================================

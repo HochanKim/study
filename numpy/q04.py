@@ -57,7 +57,7 @@ df = pd.read_csv("설비_측정값.csv")
 # 기대 출력: (2, 8)
 #            [[71.2 68.5 72.4 70.9 73.6 69.8 74.1 70.3]
 #             [ 2.8  3.1  2.9  3.4  9.6  3.   2.7  3.3]]
-
+print("문제 1. 배열 만들기 - 긴 표를 (2, 8) 로 세우기")
 datas = df.pivot(
     index="설비",  # 행의 기준점: "설비"로 지정
     columns="시점",  # 열의 기준점: "시점"으로 지정
@@ -75,7 +75,7 @@ print()
 # 기대 출력: [71.35  3.85]
 #            [71.05  3.05]
 #            [0.3 0.8]
-
+print("문제 2. 중심 보기 - mean 과 median 을 나란히")
 print(datas.mean(axis=1))  # axis=1: 행의 값
 print(np.median(datas, axis=1))
 print(datas.mean(axis=1) - np.median(datas, axis=1))
@@ -98,6 +98,7 @@ print()
 #            [72.7    3.325]
 #            [2.53 0.45]
 #            [1.79 2.18]
+print("문제 3. 흩어짐 보기 - 범위 / 사분위수 / 표준편차")
 # 설비별로 범위(최댓값-최솟값)
 print(datas.max(axis=1) - datas.min(axis=1))
 # Q1 (하위 25%)
@@ -137,21 +138,21 @@ print()
 #             [7 7 8]]
 #            [[ 62.5 100.  100. ]
 #             [ 87.5  87.5 100. ]]
-
+print("문제 4. 분포 그리기 - 정상 범위를 그어 보기")
 # 1, 2, 3 시그마 떨어진 경계
 k = np.arange(1, 4)
-print("k 쉐이프:", k.shape)
+# print("k 쉐이프:", k.shape)
 
 # 설비별 평균
 mean = datas.mean(axis=1)
-print("평균 쉐이프:", mean.shape)
+# print("평균 쉐이프:", mean.shape)
 # 설비별 표준편차
 std = datas.std(axis=1)
-print("표준편차 쉐이프:", std.shape)
+# print("표준편차 쉐이프:", std.shape)
 
 # 아래쪽 경계
 lower_bound = mean[:, None] - k * std[:, None]
-print("[:, None] 적용한 쉐이프:", mean[:, None].shape)
+# print("[:, None] 적용한 쉐이프:", mean[:, None].shape)
 print(np.round(lower_bound, 2))
 
 # 위쪽 경계
@@ -160,18 +161,19 @@ print(np.round(upper_bound, 2))
 
 # 구간 안의 개수
 diff = np.abs(datas - mean[:, None])
-print(diff[None, :, :].shape)
-print(std[None, :, None].shape)
-print(k[:, None, None].shape)
+# print(diff[None, :, :].shape)
+# print(std[None, :, None].shape)
+# print(k[:, None, None].shape)
 thres = k[:, None, None] * std[None, :, None]
 inside = diff[None, :, :] <= (thres)
-print(thres.shape)
-print(inside.shape)
+# print(thres.shape)
+# print(inside.shape)
 count = inside.sum(axis=2)
 print(count.shape)
 count = (diff[None, :, :] <= k[:, None, None] * std[None, :, None]).sum(axis=2).T
 print(count)
 print(np.round(count / datas.shape[1] * 100, 1))
+print()
 
 # ----------------------------------------
 # 문제 5. 표준화 - z-score 로 튀는 값 지목하기
@@ -193,3 +195,12 @@ print(np.round(count / datas.shape[1] * 100, 1))
 #             [-0.48 -0.34 -0.43 -0.21  2.63 -0.39 -0.53 -0.25]]
 #            [9.6] [2.63]
 #            [[1 4]]
+print("문제 5. 표준화 - z-score 로 튀는 값 지목하기")
+z_datas = (datas - datas.mean()) / datas.std()
+# [[ 0.99381864  0.91395821  1.02931216  0.98494526  1.06480569  0.95240953
+#    1.07959465  0.9671985 ]
+#  [-1.02931216 -1.02043878 -1.02635437 -1.0115654  -0.8281822  -1.02339658
+#   -1.03226996 -1.0145232 ]]
+print(z_datas.shape)
+abs = np.abs(2)
+print(z_datas > abs)
