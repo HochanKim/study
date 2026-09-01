@@ -83,7 +83,7 @@ for month in [1, 2, 3]:
             )
 
 with open(orders_file, "w", encoding="utf-8") as f:
-    for line in lines:
+    for line in lines:  # noqa: FURB122
         f.write(line + "\n")
 
 print(f"orders.csv 준비 완료 ({len(lines) - 1}건)\n")
@@ -105,6 +105,22 @@ print(f"orders.csv 준비 완료 ({len(lines) - 1}건)\n")
 #   수량 열이 int64 가 아닌 이유는 무엇일까요?
 # -------------------------------------------------------------
 
+df = pd.read_csv(orders_file, encoding="utf-8-sig")
+print("크기:", df.shape)
+print(df.head(5))
+# print(df.dtypes)
+# 주문번호      str
+# 주문일       str
+# 고객등급      str
+# 채널        str
+# 지역        str
+# 상품        str
+# 분류        str
+# 수량        str => 중간에 빈값들이 섞여있어 온전한 int64 자료형이 될 수 없음
+# 단가      int64
+print(f"열별 빈 값 개수: {sum(df.isnull().sum().values)}")
+print(df.describe())
+print()
 
 # =============================================================
 # 2단계. 데이터 정리
@@ -129,6 +145,32 @@ print(f"orders.csv 준비 완료 ({len(lines) - 1}건)\n")
 #   6) 정리 후 크기와 빈 값 개수를 다시 출력한다
 # -------------------------------------------------------------
 
+# 빈 값을 NaN으로 바꾸기
+df["수량"] = pd.to_numeric(df["수량"], errors="coerce")
+# print(df.shape)
+
+# 수량이 빈 값인 행 수 확인
+empty_cnt = df["수량"].isnull().sum()
+# print(f"수량이 빈 값인 행: {empty_cnt}건")
+
+# 빈 값의 행 삭제
+df = df.dropna(subset=["수량"])
+# print(df.shape)
+
+# 고객등급이 빈 값이면 "일반" 으로 채운다
+df["고객등급"] = df["고객등급"].fillna("일반")
+# print(df["고객등급"].isna().sum())
+
+# 수량을 정수형으로 변경
+df["수량"] = df["수량"].astype(int)
+# print(df["수량"].dtype)
+
+# 행열 크기
+print(df.shape)
+# 작업 후 빈값 개수
+empty_cnt = df.isnull().sum().values.sum()
+print(empty_cnt)
+print()
 
 # =============================================================
 # 3단계. 파생 열 만들기
@@ -148,7 +190,27 @@ print(f"orders.csv 준비 완료 ({len(lines) - 1}건)\n")
 # 만든 뒤 주문일, 월, 요일, 상품, 수량, 매출액, 대형주문 을
 # 앞 5줄만 출력하세요.
 # -------------------------------------------------------------
-
+df["매출액"] = df["수량"] * df["단가"]
+df["주문일"] = pd.to_datetime(df["주문일"])
+df["월"] = df["주문일"].dt.month
+df["요일"] = (
+    df["주문일"]
+    .dt.day_name()
+    .map(
+        {
+            "Monday": "월",
+            "Tuesday": "화",
+            "Wednesday": "수",
+            "Thursday": "목",
+            "Friday": "금",
+            "Saturday": "토",
+            "Sunday": "일",
+        }
+    )
+)
+df["대형주문"] = df["매출액"] >= 500000
+print(df[["주문일", "월", "요일", "상품", "수량", "매출액", "대형주문"]].head(5))
+print()
 
 # =============================================================
 # 4단계. 기본 통계
