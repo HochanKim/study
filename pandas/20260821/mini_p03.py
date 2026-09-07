@@ -234,6 +234,33 @@ print()
 #   대형주문 비율: 00.0%
 # -------------------------------------------------------------
 
+earning = 0
+for cash in df["매출액"]:
+    earning += cash
+
+# 상품 판매 수량 파악을 위한 for문과 딕셔너리
+prod_dict = {}
+for prod in df["상품"]:
+    if prod in prod_dict:
+        prod_dict[prod] += 1
+    else:
+        prod_dict[prod] = 1
+prod_sorted = sorted(prod_dict.items(), key=lambda x: x[1], reverse=True)
+# print(prod_sorted) => [('키보드', 33), ('텀블러', 25), ('노트북', 23), ('이어폰', 21), ('마우스', 20), ('모니터', 17), ('가습기', 16)]
+
+# 많이 팔린 상품
+keyboard = prod_sorted[0][0]
+# 많이 팔린 상품의 수량
+keyboard_sell = prod_sorted[0][1]
+# 많이 팔린 상품의 단가
+key_price = df.loc[df["상품"] == "키보드", "단가"].iloc[0]
+
+print(f"전체 주문: {len(df)}건")
+print(f"전체 매출: {earning:,}원")
+print(f"평균 주문: {round(earning / len(df)):,}원")
+print(f"최대 주문: {round(keyboard_sell * key_price):,}원 ({keyboard})")
+print(f"대형 주문 비율: {round((sum(df['대형주문'])) / (len(df)) * 100, 1)}%")
+print()
 
 # =============================================================
 # 5단계. 그룹별 집계
@@ -254,7 +281,22 @@ print()
 #
 # 숫자가 지수 표기(1.23e+06)로 나오면 round(0) 을 붙이세요.
 # -------------------------------------------------------------
-
+grade_earn = df.sort_values("매출액", ascending=False)
+# subset => 모든 열이 똑같은 중복 제거
+print(grade_earn.drop_duplicates(subset="분류")[["분류", "매출액"]])
+print()
+print(df.groupby("지역").agg(주문건수=("매출액", "count"), 총매출=("매출액", "sum")))
+print()
+print(df.groupby("채널")["매출액"].mean())
+print()
+print(
+    df.groupby("고객등급").agg(
+        주문건수=("매출액", "count"),
+        총매출=("매출액", "sum"),
+        평균주문액=("매출액", "mean"),
+    )
+)
+print()
 
 # =============================================================
 # 6단계. 월별 추이
@@ -273,7 +315,21 @@ print()
 #   2월  00,000,000원  ***********      (-00.0%)
 #   3월  00,000,000원  *************    (+00.0%)
 # -------------------------------------------------------------
+df["월"] = df["주문일"].dt.month
+# print(df.groupby(df["월"])["매출액"].sum())
+month_earn = df.groupby(df["월"])["매출액"].sum()
+# print(df.groupby(df["월"])["수량"].sum())
 
+for month, earn in month_earn.items():
+    mon_earning = df[df["월"] == month]["매출액"].sum()
+    ex_mon_earn = df[df["월"] == month - 1]["매출액"].sum()
+    if month >= 2:
+        print(
+            f"{month}월 {earn:,} {'*' * (earn // 1000000)} ({round(((mon_earning - ex_mon_earn) / ex_mon_earn) * 100, 1)}%)"
+        )
+    else:
+        print(f"{month}월 {earn:,} {'*' * (earn // 1000000)}")
+print()
 
 # =============================================================
 # 7단계. 조건 분석
@@ -290,7 +346,19 @@ print()
 # 조건 두 개 이상은 괄호로 묶고 & 나 | 를 쓰세요.
 # 목록으로 확인할 때는 isin 을 쓰면 편합니다.
 # -------------------------------------------------------------
+print(
+    "VIP 주문 건수:",
+    df[df["고객등급"] == "VIP"]["수량"].sum(),
+    "\nVIP 총 매출:",
+    df[df["고객등급"] == "VIP"]["매출액"].sum(),
+)
 
+# 서울/경기 지역 매출액
+capital_metro = (df[df["지역"] == "서울"]["매출액"].sum()) | (
+    df[df["지역"] == "경기"]["매출액"].sum()
+)
+
+print(f"{round((capital_metro / df['매출액'].sum()) * 100, 2)}%")
 
 # =============================================================
 # 8단계. 피벗 테이블
@@ -308,6 +376,35 @@ print()
 #   매출이 가장 큰 (지역, 분류) 조합은 어디인가요?
 # -------------------------------------------------------------
 
+pv_table_1 = df.pivot_table(
+    index="지역",
+    columns="분류",
+    values="매출액",
+    fill_value=0,  # 빈칸을 0으로 채우기
+    margins=True,
+    margins_name="합계",  # '합계' 행과 열을 추가
+)
+print(pv_table_1.round(0))
+# 분류         가전        생활      주변기기         합계
+# 지역
+# 경기      2590909.0    174000.0   107733.0      949515.0
+# 광주      3191667.0    102444.0   161867.0     1156944.0
+# 대구      1441667.0     86250.0   181667.0      375857.0
+# 부산      1628571.0    150286.0   185500.0      537464.0
+# 서울      3475000.0    170200.0   160778.0      741261.0
+# 합계      2518750.0    136195.0   160851.0      762819.0
+print()
+
+# 한 행의 주문건수를 기본 '1'로 처리
+df["주문건수"] = 1
+pv_table_2 = df.pivot_table(
+    index="고객등급",
+    columns="채널",
+    values="주문건수",
+    aggfunc="sum",  # 같은 그룹의 1들을 더하기
+    fill_value=0,  # 빈칸을 0으로 채우기
+)
+print(pv_table_2.round(0))
 
 # =============================================================
 # 9단계. 상위 항목 뽑기
@@ -328,6 +425,28 @@ print()
 #      그리고 reindex(week_order) 를 쓰면 됩니다.
 # -------------------------------------------------------------
 
+print(
+    df[["주문번호", "주문일", "상품", "수량", "매출액"]]
+    .sort_values("매출액", ascending=False)  # 매출 기준 내림차순 정렬
+    .head(5)
+)
+print()
+print(
+    df.groupby("상품")["수량"]  # 상품별로 묶어서
+    .sum()  # 판매 수량의 합계 계산
+    .sort_values(ascending=False)  # 수량 기준 내림차순 정렬
+    .head(3)
+)
+print()
+
+earn_top1_region = (
+    # 지역별로 묶어서  매출 수량의 합계 계산
+    df.groupby("지역")["매출액"].sum().sort_values(ascending=False).head(1)
+)
+print(
+    earn_top1_region.index[0],
+    f"{round((earn_top1_region.values[0] / df['매출액'].sum()) * 100, 2)}%",
+)
 
 # =============================================================
 # 10단계. 리포트 저장

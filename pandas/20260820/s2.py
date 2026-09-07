@@ -584,7 +584,7 @@ by_branch = (
 print("[지점별 실적]")
 print(by_branch)
 
-# 6) wjwkd
+# 6) 저장
 final = DATA / "최종 보고서.csv"
 by_branch.to_csv(final, encoding="utf-8-sig")
 print(f"\n저장 완료: {final.name}")
