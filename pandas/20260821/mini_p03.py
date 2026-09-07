@@ -82,7 +82,7 @@ for month in [1, 2, 3]:
                 f"{name},{cat},{qty_text},{price}"
             )
 
-with open(orders_file, "w", encoding="utf-8") as f:
+with open(orders_file, "w", encoding="utf-8-sig") as f:
     for line in lines:  # noqa: FURB122
         f.write(line + "\n")
 
@@ -447,7 +447,7 @@ print(
     earn_top1_region.index[0],
     f"{round((earn_top1_region.values[0] / df['매출액'].sum()) * 100, 2)}%",
 )
-
+print()
 # =============================================================
 # 10단계. 리포트 저장
 # =============================================================
@@ -468,6 +468,52 @@ print(
 # 저장한 뒤 각 파일을 다시 읽어서 크기를 출력해 확인하세요.
 # -------------------------------------------------------------
 
+# 정리된 전체 데이터 -> data/주문내역_정리.csv
+df_copied = df.copy()
+df_copied.to_csv(DATA / "주문내역_정리.csv", index=False, encoding="utf-8-sig")
+read_copied = pd.read_csv(DATA / "주문내역_정리.csv")
+print(read_copied.shape)
+
+# 지역별 집계 -> data/지역별_매출.csv
+df_region = (
+    df.groupby("지역")["매출액"]
+    .sum()
+    .reset_index()
+    .sort_values(by="매출액", ascending=False)
+)
+df_region.to_csv(DATA / "지역별_매출.csv", index=False, encoding="utf-8-sig")
+
+read_region = pd.read_csv(DATA / "지역별_매출.csv")
+print(read_region.shape)
+
+# 월별 집계 -> data/월별_매출.csv
+df_month = (
+    df.groupby("월")["매출액"].sum().reset_index().sort_values(by="월", ascending=True)
+)
+df_month.to_csv(DATA / "월별_매출.csv", index=False, encoding="utf-8-sig")
+
+read_month = pd.read_csv(DATA / "월별_매출.csv")
+print(read_month.shape)
+print()
+
+# 엑셀 내보내기
+import openpyxl
+
+# 엑셀 파일 생성
+df_xlsx = openpyxl.Workbook()
+
+# ExcelWriter를 열고 각 시트에 데이터들 저장
+with pd.ExcelWriter(DATA / "매출리포트.xlsx", engine="openpyxl") as w:
+    df_copied.to_excel(w, sheet_name="전체내역", index=False)
+    df_region.to_excel(w, sheet_name="지역별", index=False)
+    df_month.to_excel(w, sheet_name="월별", index=False)
+
+read_total = pd.read_excel(DATA / "매출리포트.xlsx", sheet_name="전체내역")
+read_region = pd.read_excel(DATA / "매출리포트.xlsx", sheet_name="지역별")
+read_month = pd.read_excel(DATA / "매출리포트.xlsx", sheet_name="월별")
+print(read_total.shape)
+print(read_region.shape)
+print(read_month.shape)
 
 # =============================================================
 # 도전 과제 (시간이 남으면)
