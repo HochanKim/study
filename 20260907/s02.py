@@ -106,14 +106,18 @@ w5 = 0.1  # 누적 관객수 비율 가중치 (10%)
 w6 = 0.1  # 천만 돌파 비율 가중치 (10%)
 
 
-df_movie["최종_선형점수"] = (
-    (df_movie["s1"] * w1)
-    + (df_movie["s2"] * w2)
-    + (df_movie["s3"] * w3)
-    + (df_movie["s4"] * w4)
-    + (df_movie["s5"] * w5)
-    + (df_movie["s6"] * w6)
-) * 100  # 100점 만점으로 환산
+df_movie["최종_선형점수"] = round(
+    (
+        (df_movie["s1"] * w1)
+        + (df_movie["s2"] * w2)
+        + (df_movie["s3"] * w3)
+        + (df_movie["s4"] * w4)
+        + (df_movie["s5"] * w5)
+        + (df_movie["s6"] * w6)
+    )
+    * 100,
+    2,
+)  # 100점 만점으로 환산
 
 # 최종 점수 기준 순위 부여
 df_movie["최종_순위"] = (
@@ -125,3 +129,33 @@ df_result = df_movie[["제목", "최종_선형점수", "최종_순위"]].sort_va
 print(df_result)
 
 df_result.to_csv("movie_ranking_result.csv", index=False, encoding="utf-8-sig")
+
+
+# SSE / MSE 계산
+# 데이터 3개 선택
+sample = df_movie.iloc[[0, 2, 9]].copy()
+
+# 예측값
+sample["예측값"] = sample["최종_선형점수"]
+
+# 실제 누적 관객수를 Max-Min 정규화
+sample["실제값"] = min_max_scale(sample["누적관객수 (명)"]) * 100
+
+# 오차 계산
+sample["오차"] = sample["실제값"] - sample["예측값"]
+
+# 오차 제곱
+sample["오차^2"] = sample["오차"] ** 2
+
+
+# SSE
+SSE = sample["오차^2"].sum()
+
+# MSE
+MSE = SSE / len(sample)
+
+print(sample[["제목", "예측값", "실제값", "오차", "오차^2"]])
+
+print()
+print("SSE :", round(SSE, 2))
+print("MSE :", round(MSE, 2))
